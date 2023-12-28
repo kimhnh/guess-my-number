@@ -1,3 +1,10 @@
-# Guess My Number
+# JavaScript to React
+A series of small exercises rewriting Jonas Schmedtmann's JS projects in React. You can find his repository [**here**](https://github.com/jonasschmedtmann/complete-javascript-course).
 
-A number guessing game rewrote in React based on [**this project**](https://github.com/jonasschmedtmann/complete-javascript-course/tree/master/05-Guess-My-Number) by Jonas Schmedtmann.
+## Rewritten Projects
+| Project Name  | Status | Demo |
+| ------------- | ------ | ---- |
+| [Guess My Number](https://github.com/kimhnh/js-to-react/tree/main/guess-my-number) | ✔ | - |
+| Modal Window | ✖ | - |
+| Pig Game | ✖ | - |
+
