@@ -33,7 +33,8 @@ main {
   justify-content: space-around;
 }
 
-.left {
+.left,
+form {
   width: 52rem;
   display: flex;
   flex-direction: column;
