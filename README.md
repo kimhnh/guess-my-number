@@ -7,5 +7,5 @@ A series of small exercises rewriting Jonas Schmedtmann's JS projects in React. 
 | Project Name                                                                       | Status | Demo |
 | ---------------------------------------------------------------------------------- | ------ | ---- |
 | [Guess My Number](https://github.com/kimhnh/js-to-react/tree/main/guess-my-number) | ✔      | -    |
-| Modal Window                                                                       | WIP    | -    |
+| Modal Window                                                                       | ✖      | -    |
 | Pig Game                                                                           | ✖      | -    |
