@@ -8,4 +8,4 @@ A series of small exercises rewriting Jonas Schmedtmann's JS projects in React. 
 | ---------------------------------------------------------------------------------- | ------ | ---- |
 | [Guess My Number](https://github.com/kimhnh/js-to-react/tree/main/guess-my-number) | ✔      | -    |
 | [Modal Window](https://github.com/kimhnh/js-to-react/tree/main/modal)              | ✔      | -    |
-| Pig Game                                                                           | ✖      | -    |
+| Pig Game                                                                           | WIP    | -    |
