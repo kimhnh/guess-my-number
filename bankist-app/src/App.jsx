@@ -12,8 +12,6 @@ import './index.css';
 
 /* Original Bankist App by Jonas Schmedtmann. */
 
-// sort works but now any transfer/request loan actions do not update immediately
-
 const initialData = [
   {
     owner: 'Jonas Schmedtmann',
@@ -62,11 +60,10 @@ export default function App() {
   const [data, setData] = useState(initialData);
   const [user, setUser] = useState('');
   const [password, setPassword] = useState('');
-  const [currUser, setCurrUser] = useState(''); // display only
+  const [loggedUser, setLoggedUser] = useState(''); // to display UI
   const [isSorted, setIsSorted] = useState(false);
-  const [displayMovs, setDisplayMovs] = useState('');
 
-  // Derived states (Helps update "real-time")
+  // Derived states (Helps update "real-time" but must all map data)
   let currMovs = data.find((d) => user === d.username)?.movements;
   let currBalance = data.find((d) => user === d.username)?.balance;
   let currInterest = data.find((d) => user === d.username)?.interestRate;
@@ -80,35 +77,46 @@ export default function App() {
 
   // Event-handlers
   function handleClick() {
-    setCurrUser('');
     setUser('');
     setPassword('');
-    setDisplayMovs('');
+    setLoggedUser('');
     setIsSorted(false);
+    setCloseUser('');
+    setClosePassword('');
   }
 
   function handleSortClick() {
     if (!isSorted) {
       setIsSorted(!isSorted);
-      setDisplayMovs((d) => currMovs.toSorted((a, b) => a - b));
+      setData((d) =>
+        d.map((i) =>
+          user === i.username
+            ? {
+                ...i,
+                originalMovements: i.movements.slice(),
+                movements: i.movements.toSorted((a, b) => a - b),
+              }
+            : i
+        )
+      );
     }
 
     if (isSorted) {
       setIsSorted(!isSorted);
-      setDisplayMovs((d) => data.find((d) => user === d.username).movements);
+      setData((d) =>
+        d.map((i) => (user === i.username ? { ...i, movements: i.originalMovements.slice() } : i))
+      );
     }
   }
 
   function handleLoginSubmit(e) {
     e.preventDefault();
 
-    // revisit this condition
     if (
-      user === data.find((d) => user === d.username)?.username &&
+      user === data.find((d) => user === d.username).username &&
       password === data.find((d) => password === d.pin).pin
     ) {
-      setCurrUser((c) => data.find((d) => user === d.username));
-      setDisplayMovs((d) => data.find((d) => user === d.username).movements);
+      setLoggedUser(data.find((d) => user === d.username));
     } else {
       setUser('');
       setPassword('');
@@ -121,19 +129,19 @@ export default function App() {
 
     // 1. prevent self-transfer, 2. recipient exists in data, 3. positive amount, 4. transferAmount <= balance
     if (
-      currUser.username !== transferTo &&
+      loggedUser.username !== transferTo &&
       data.find((d) => transferTo === d.username) &&
       transferAmount > 0 &&
-      transferAmount <= currUser.balance
+      transferAmount <= loggedUser.balance
     ) {
-      // Add movement (currUser)
+      // Add movement (loggedUser)
       setData((d) =>
         d.map((i) =>
-          currUser.username === i.username
+          loggedUser.username === i.username
             ? {
                 ...i,
-                movements: [...currUser.movements, -transferAmount],
-                balance: currUser.balance - transferAmount,
+                movements: [...loggedUser.movements, -transferAmount],
+                balance: loggedUser.balance - transferAmount,
               }
             : i
         )
@@ -177,24 +185,22 @@ export default function App() {
   function handleCloseSubmit(e) {
     e.preventDefault();
 
-    // only check if current user === close user
-    if (currUser.username === closeUser && currUser.pin === closePassword) {
+    // check if current user === close user
+    if (loggedUser.username === closeUser && loggedUser.pin === closePassword) {
       setData((d) => d.filter((i) => closeUser !== i.username));
       handleClick(); // logout
     } else {
       console.log('Failed to close account.');
     }
-    setCloseUser('');
-    setClosePassword('');
-    setDisplayMovs('');
-    setIsSorted(false);
   }
 
   return (
     <>
       <Navbar>
         <p className="welcome">
-          {!currUser ? 'Log in to get started.' : `Welcome back, ${currUser.owner.split(' ')[0]}!`}
+          {!loggedUser
+            ? 'Log in to get started.'
+            : `Welcome back, ${loggedUser.owner.split(' ')[0]}!`}
         </p>
         <img
           src="./src/assets/logo.png"
@@ -202,7 +208,7 @@ export default function App() {
           className="logo"
         />
 
-        {!currUser ? (
+        {!loggedUser ? (
           <Form
             className={'login'}
             onSubmit={handleLoginSubmit}
@@ -235,7 +241,7 @@ export default function App() {
         )}
       </Navbar>
 
-      {currUser && (
+      {loggedUser && (
         <MainContainer>
           {/* Balance */}
           <Content className={'balance'}>
@@ -248,9 +254,9 @@ export default function App() {
             <p className="balance__value">{currBalance} EUR</p>
           </Content>
 
-          {/* Movements: displayed descending order */}
+          {/* Movements: displayed in descending order */}
           <Content className={'movements'}>
-            {displayMovs.toReversed().map((mov, index, arr) => (
+            {currMovs.toReversed().map((mov, index, arr) => (
               <Inner
                 className={'movements__row'}
                 key={crypto.randomUUID()}
@@ -278,6 +284,7 @@ export default function App() {
             <p className="summary__value summary__value--out">
               {Math.abs(currMovs.filter((mov) => mov < 0).reduce((acc, curr) => acc + curr, 0))}€
             </p>
+            {/* interest per deposit as long as the interest is >= 1 euro */}
             <p className="summary__label">Interest</p>
             <p className="summary__value summary__value--interest">
               {currMovs
