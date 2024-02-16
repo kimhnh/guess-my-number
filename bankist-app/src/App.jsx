@@ -1,59 +1,17 @@
 import { useState } from 'react';
-import Button from './components/Button';
+import { initialData } from './data/data';
+import Button from './components/ui/Button';
 import Content from './components/Content';
-import Form from './components/Form';
+import Form from './components/form/Form';
 import Inner from './components/Inner';
-import Input from './components/Input';
-import Label from './components/Label';
+import Input from './components/form/Input';
+import Label from './components/form/Label';
 import LogoutTimer from './components/LogoutTimer';
 import MainContainer from './components/MainContainer';
 import Navbar from './components/Navbar';
-import './index.css';
+import './assets/index.css';
 
 /* Original Bankist App by Jonas Schmedtmann. */
-
-const initialData = [
-  {
-    owner: 'Jonas Schmedtmann',
-    movements: [200, 450, -400, 3000, -650, -130, 70, 1300],
-    interestRate: 1.2, // %
-    pin: 1111,
-  },
-  {
-    owner: 'Jessica Davis',
-    movements: [5000, 3400, -150, -790, -3210, -1000, 8500, -30],
-    interestRate: 1.5,
-    pin: 2222,
-  },
-  {
-    owner: 'Steven Thomas Williams',
-    movements: [200, -200, 340, -300, -20, 50, 400, -460],
-    interestRate: 0.7,
-    pin: 3333,
-  },
-  {
-    owner: 'Sarah Smith',
-    movements: [430, 1000, 700, 50, 90],
-    interestRate: 1,
-    pin: 4444,
-  },
-];
-
-// create accountNo, balance, username properties (forEach OK for now...?)
-const createUsername = function (arr) {
-  return arr.forEach((el, index) => {
-    el.accountNo = index + 1;
-    el.balance = el.movements.reduce((acc, curr) => acc + curr, 0);
-    el.username = el.owner
-      .toLowerCase()
-      .split(' ')
-      .map((el) => el[0])
-      .join('');
-  });
-};
-
-createUsername(initialData);
-// console.log(initialData);
 
 export default function App() {
   // Current user states
