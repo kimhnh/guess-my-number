@@ -1,105 +1,108 @@
-import { useState } from 'react';
-import './index.css';
-
-const modalData = [
-  {
-    title: 'Who created Lorem Ipsum?',
-    description:
-      'It is widely believed that the history of Lorem Ipsum originates with Cicero in the 1st Century BC and his text De Finibus bonorum et malorum. This philosophical work, also known as On the Ends of Good and Evil, was split into five books.',
-  },
-  {
-    title: 'What does it mean?',
-    description:
-      '"Nor again is there anyone who loves or pursues or desires to obtain pain of itself, because it is pain, but occasionally circumstances occur in which toil and pain can procure him some great pleasure".',
-  },
-  {
-    title: 'Lorem Ipsum',
-    description:
-      "Advancing to the 1960s, Lorem Ipsum was made popular by typeface manufacturer Letraset, who used it in their advertising campaigns. Letraset offered pages of Lorem Ipsum as rub down transfer sheets, which were widely used in the pre-computer era for layouts. These transfer pages, known as Letraset Body Type, were featured in the company's advertising and their popular catalogue.",
-  },
-];
+import { useEffect, useState } from "react";
+import { modalData } from "./data.jsx";
+import "./index.css";
 
 export default function App() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isActive, setIsActive] = useState(null);
+  const [selectedId, setSelectedId] = useState("");
 
-  function handleClick(num) {
-    setIsOpen((o) => !o);
-    setIsActive((s) => (typeof num === 'number' ? num : null));
+  useEffect(() => {
+    function callback(e) {
+      if (e.code === "Escape") {
+        handleCloseModal();
+      }
+    }
+
+    document.addEventListener("keydown", callback);
+    return () => document.removeEventListener("keydown", callback);
+  }, [handleCloseModal]);
+
+  // handler functions
+  function handleSelectModal(num) {
+    setSelectedId((s) => num);
+    setIsOpen(true);
+  }
+
+  function handleCloseModal() {
+    setSelectedId("");
+    setIsOpen(false);
   }
 
   return (
     <div className="app">
-      <Button
-        num={0}
-        onClick={handleClick}
-      >
-        Marcus Tullius Cicero
-      </Button>
-      <Button
-        num={1}
-        onClick={handleClick}
-      >
-        Translation
-      </Button>
-      <Button
-        num={2}
-        onClick={handleClick}
-      >
-        Usage
-      </Button>
+      <ButtonList
+        modalData={modalData}
+        onSelectModal={handleSelectModal}
+      />
       {isOpen && (
-        <Modal>
-          <Button
-            className="close-modal"
-            onClick={handleClick}
-          >
-            &times;
-          </Button>
-          <ModalItem
-            key={isActive}
-            isActive={isActive}
-            modalData={modalData}
-          />
-        </Modal>
+        <>
+          <Modal>
+            <Button
+              className="close-modal"
+              onClick={handleCloseModal}
+            >
+              &times;
+            </Button>
+            <ModalItem
+              modalData={modalData}
+              selectedId={selectedId}
+            />
+          </Modal>
+          <Overlay onCloseModal={handleCloseModal} />
+        </>
       )}
-      {isOpen && <Overlay onClick={handleClick} />}
     </div>
   );
 }
 
-// Reusable component
-function Button({ children, className = 'show-modal', onClick, num }) {
+// Components
+function ButtonList({ modalData, onSelectModal }) {
   return (
-    <button
-      num={num}
-      className={className}
-      onClick={() => onClick(num)}
-    >
-      {children}
-    </button>
+    <div>
+      {modalData.map((m) => (
+        <Button
+          className="show-modal"
+          key={m.dataID + m.tab}
+          {...m}
+          onClick={() => onSelectModal(m.dataID)}
+        >
+          {m.tab}
+        </Button>
+      ))}
+    </div>
   );
 }
 
-// Composition
 function Modal({ children }) {
   return <div className="modal">{children}</div>;
 }
 
-function ModalItem({ modalData, isActive }) {
+function ModalItem({ modalData, selectedId }) {
   return (
     <>
-      <h1>{modalData[isActive].title}</h1>
-      <p>{modalData[isActive].description}</p>
+      <h1>{modalData[selectedId - 1].title}</h1>
+      <p>{modalData[selectedId - 1].description}</p>
     </>
   );
 }
 
-function Overlay({ onClick }) {
+function Overlay({ onCloseModal }) {
   return (
     <div
       className="overlay"
-      onClick={onClick}
+      onClick={onCloseModal}
     ></div>
+  );
+}
+
+// Reusable
+function Button({ children, className = "show-modal", onClick }) {
+  return (
+    <button
+      className={className}
+      onClick={onClick}
+    >
+      {children}
+    </button>
   );
 }
