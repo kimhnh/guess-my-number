@@ -4,7 +4,7 @@ import Form from './form/Form';
 import Input from './form/Input';
 import Label from './form/Label';
 
-export default function CloseOperation({ loggedUser, setData, onLogInOut }) {
+export default function CloseOperation({ loggedUser, setData, onLogout }) {
   const [closeUser, setCloseUser] = useState('');
   const [closePassword, setClosePassword] = useState('');
 
@@ -14,7 +14,9 @@ export default function CloseOperation({ loggedUser, setData, onLogInOut }) {
     // check if current user === close user
     if (loggedUser.username === closeUser && loggedUser.pin === closePassword) {
       setData((d) => d.filter((i) => closeUser !== i.username));
-      onLogInOut(); // logout
+      // setCloseUser('')
+      // setClosePassword('')
+      onLogout(); // logout
     } else {
       console.log('Failed to close account.');
     }
