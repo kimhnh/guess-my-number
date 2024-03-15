@@ -7,18 +7,23 @@ import Label from './form/Label';
 export default function TransferOperation({ loggedUser, data, setData }) {
   const [transferTo, setTransferTo] = useState('');
   const [transferAmount, setTransferAmount] = useState('');
+  const nowDate = new Date().toISOString();
 
   function handleTransferSubmit(e) {
     e.preventDefault();
 
-    // 1. prevent self-transfer, 2. recipient exists in data, 3. positive amount, 4. transferAmount <= balance
+    // 1. prevent self-transfer
+    // 2. recipient exists in data
+    // 3. positive amount
+    // 4. transferAmount <= balance
+
     if (
       loggedUser.username !== transferTo &&
       data.find((d) => transferTo === d.username) &&
       transferAmount > 0 &&
       transferAmount <= loggedUser.balance
     ) {
-      // Add movement (loggedUser)
+      // Add movement and date (loggedUser)
       setData((d) =>
         d.map((i) =>
           loggedUser.username === i.username
@@ -26,12 +31,13 @@ export default function TransferOperation({ loggedUser, data, setData }) {
                 ...i,
                 movements: [...loggedUser.movements, -transferAmount],
                 balance: loggedUser.balance - transferAmount,
+                movementsDates: [...loggedUser.movementsDates, nowDate],
               }
             : i
         )
       );
 
-      // Add movement (recipient)
+      // Add movement and date (recipient)
       setData((d) =>
         d.map((i) =>
           transferTo === i.username
@@ -39,6 +45,7 @@ export default function TransferOperation({ loggedUser, data, setData }) {
                 ...i,
                 movements: [...i.movements, transferAmount],
                 balance: i.balance + transferAmount,
+                movementsDates: [...i.movementsDates, nowDate],
               }
             : i
         )

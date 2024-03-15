@@ -4,8 +4,30 @@ import Form from './form/Form';
 import Input from './form/Input';
 import Label from './form/Label';
 
-export default function LoanOperation({ loan, setLoan, onLoanSubmit }) {
-  // Delay Loan (setTimeout)
+export default function LoanOperation({ currMovs, currBalance, setData, user }) {
+  const [loan, setLoan] = useState('');
+  const nowDate = new Date().toISOString();
+
+  function handleLoanSubmit(e) {
+    e.preventDefault();
+    if (loan > 0 && currMovs.some((mov) => mov <= loan * 0.1)) {
+      setData((d) =>
+        d.map((i) =>
+          user === i.username
+            ? {
+                ...i,
+                movements: [...i.movements, loan],
+                balance: currBalance + loan,
+                movementsDates: [...i.movementsDates, nowDate],
+              }
+            : i
+        )
+      );
+    } else {
+      console.log('Failed to receive loan.');
+    }
+    setLoan('');
+  }
 
   return (
     <div className='operation operation--loan'>
@@ -13,7 +35,7 @@ export default function LoanOperation({ loan, setLoan, onLoanSubmit }) {
 
       <Form
         className={'form form--loan'}
-        onSubmit={onLoanSubmit}
+        onSubmit={handleLoanSubmit}
       >
         <Input
           type={'number'}
