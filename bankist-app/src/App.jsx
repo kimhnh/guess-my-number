@@ -15,31 +15,45 @@ import './assets/index.css';
 /* Original Bankist App by Jonas Schmedtmann. */
 
 /* TODO:
-- fix date formatter + add new date values into loan/transfer operations
-- fix logout timer
-- login -> sort -> log out -> sort bugged
+- prevent logout timer from re-rendering every second
 */
 
 export default function App() {
   const [data, setData] = useState(initialData);
   const [user, setUser] = useState('');
   const [password, setPassword] = useState('');
-  const [loggedUser, setLoggedUser] = useState(''); // to display UI
+  const [loggedUser, setLoggedUser] = useState(''); // to display UI only
   const [isSorted, setIsSorted] = useState(false);
-  const [loan, setLoan] = useState('');
-  const [logoutTimer, setLogoutTimer] = useState(100); // change to 5 * 60
+  const [logoutTimer, setLogoutTimer] = useState(5); // change to 5 * 60
 
   // Derived states (Helps update "real-time" but must all map data)
+  let currUser = data.find((d) => user === d.username);
   let currMovs = data.find((d) => user === d.username)?.movements;
   let currBalance = data.find((d) => user === d.username)?.balance;
   let currInterest = data.find((d) => user === d.username)?.interestRate;
 
   // Event handlers
-  function handleLogInOut() {
+  function handleLogout() {
+    // delete backupMovements with deconstructing
+    if (currUser.backupMovements) {
+      console.log('this account has a backup Movs');
+      setData((d) =>
+        d
+          .map((i) =>
+            user === i.username
+              ? {
+                  ...i,
+                  movements: i.backupMovements.slice(),
+                }
+              : i
+          )
+          .map(({ backupMovements, ...rest }) => rest)
+      );
+    }
+    setIsSorted(false);
     setUser('');
     setPassword('');
     setLoggedUser('');
-    setIsSorted(false);
   }
 
   function handleLoginSubmit(e) {
@@ -57,6 +71,7 @@ export default function App() {
     }
   }
 
+  // link sorted movements with movementsDates (maybe I cant do this within my scope right now)
   function handleSortClick() {
     if (!isSorted) {
       setIsSorted((s) => !s);
@@ -65,7 +80,7 @@ export default function App() {
           user === i.username
             ? {
                 ...i,
-                originalMovements: i.movements.slice(),
+                backupMovements: i.movements.slice(),
                 movements: i.movements.toSorted((a, b) => a - b),
               }
             : i
@@ -73,49 +88,40 @@ export default function App() {
       );
     }
 
+    // revert to original movements array
+    // delete backupMovements with deconstructing
     if (isSorted) {
       setIsSorted((s) => !s);
       setData((d) =>
-        d.map((i) => (user === i.username ? { ...i, movements: i.originalMovements.slice() } : i))
+        d
+          .map((i) =>
+            user === i.username
+              ? {
+                  ...i,
+                  movements: i.backupMovements.slice(),
+                }
+              : i
+          )
+          .map(({ backupMovements, ...rest }) => rest)
       );
     }
   }
 
-  function handleLoanSubmit(e) {
-    e.preventDefault();
-    if (loan > 0 && currMovs.some((mov) => mov <= loan * 0.1)) {
-      setData((d) =>
-        d.map((i) =>
-          user === i.username
-            ? { ...i, movements: [...i.movements, loan], balance: currBalance + loan }
-            : i
-        )
-      );
-    } else {
-      console.log('Failed to receive loan.');
-    }
-    setLoan('');
-  }
-
-  // 1. start timer when logged in (dependancy array) [DONE]
-  // 2. update timer every second (setter function, subtract 1) [DONE]
-  // 3. do the above only when logged in + timer is greater than 0 [DONE]
-  // 4. restart timer when user makes a transfer / takes out a loan
-  // 5. cancel timer (clean-up fn) [DONE]
+  // 1. restart timer when user makes a transfer / takes out a loan
 
   // Effects
   // Logout Timer (setInterval)
-  useEffect(() => {
-    const timer = setInterval(() => {
-      if (loggedUser && logoutTimer > 0) {
-        setLogoutTimer((l) => l - 1);
-      }
-    }, 1000);
+  // useEffect(() => {
+  //   const timer = setInterval(() => {
+  //     if (loggedUser && logoutTimer > 0) {
+  //       setLogoutTimer((l) => l - 1);
+  //     }
+  //   }, 1000);
 
-    return () => {
-      clearInterval(timer);
-    };
-  }, [loggedUser, logoutTimer]);
+  //   return () => {
+  //     clearInterval(timer);
+  //   };
+  // }, [loggedUser, logoutTimer]);
 
   return (
     <>
@@ -123,7 +129,7 @@ export default function App() {
       <Navbar
         loggedUser={loggedUser}
         onLoginSubmit={handleLoginSubmit}
-        onLogInOut={handleLogInOut}
+        onLogout={handleLogout}
       >
         <Input
           type={'text'}
@@ -150,7 +156,7 @@ export default function App() {
             currBalance={currBalance}
           />
           <Movements
-            loggedUser={loggedUser}
+            currUser={currUser}
             currMovs={currMovs}
           />
           <Summary
@@ -167,14 +173,15 @@ export default function App() {
             setData={setData}
           />
           <LoanOperation
-            loan={loan}
-            setLoan={setLoan}
-            onLoanSubmit={handleLoanSubmit}
+            currMovs={currMovs}
+            currBalance={currBalance}
+            setData={setData}
+            user={user}
           />
           <CloseOperation
             loggedUser={loggedUser}
             setData={setData}
-            onLogInOut={handleLogInOut}
+            onLogout={handleLogout}
           />
 
           {/* Logout Timer*/}
