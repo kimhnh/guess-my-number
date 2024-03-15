@@ -1,7 +1,7 @@
 import Button from './ui/Button';
 import Form from './form/Form';
 
-export default function Navbar({ loggedUser, onLoginSubmit, onLogInOut, children }) {
+export default function Navbar({ loggedUser, onLoginSubmit, onLogout, children }) {
   return (
     <nav>
       <p className='welcome'>
@@ -26,7 +26,7 @@ export default function Navbar({ loggedUser, onLoginSubmit, onLogInOut, children
         </Form>
       ) : (
         <Button
-          onClick={onLogInOut}
+          onClick={onLogout}
           className='login__btn'
         >
           Logout
