@@ -1,5 +1,5 @@
 import Button from './ui/Button';
-import Form from './form/Form';
+import Form from './ui/Form';
 
 export default function Navbar({ loggedUser, onLoginSubmit, onLogout, children }) {
   return (

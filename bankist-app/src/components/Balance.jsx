@@ -1,5 +1,5 @@
 import formatCurrency from '../utils/formatCurrency';
-import Inner from './Inner';
+import Inner from './ui/Inner';
 
 export default function Balance({ loggedUser, currBalance }) {
   const now = new Date();

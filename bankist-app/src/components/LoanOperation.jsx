@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import Button from './ui/Button';
-import Form from './form/Form';
-import Input from './form/Input';
-import Label from './form/Label';
+import Form from './ui/Form';
+import Input from './ui/Input';
+import Label from './ui/Label';
 
-export default function LoanOperation({ currMovs, currBalance, setData, user }) {
+export default function LoanOperation({ currMovs, currBalance, setData, user, onResetTimer }) {
   const [loan, setLoan] = useState('');
   const nowDate = new Date().toISOString();
 
@@ -27,6 +27,7 @@ export default function LoanOperation({ currMovs, currBalance, setData, user }) 
       console.log('Failed to receive loan.');
     }
     setLoan('');
+    onResetTimer();
   }
 
   return (

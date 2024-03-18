@@ -1,5 +1,5 @@
 import formatCurrency from '../utils/formatCurrency';
-import Inner from './Inner';
+import Inner from './ui/Inner';
 
 function formatMovDates(account, date) {
   // calculate days passed from NOW to movement date

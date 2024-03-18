@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import Button from './ui/Button';
-import Form from './form/Form';
-import Input from './form/Input';
-import Label from './form/Label';
+import Form from './ui/Form';
+import Input from './ui/Input';
+import Label from './ui/Label';
 
 export default function CloseOperation({ loggedUser, setData, onLogout }) {
   const [closeUser, setCloseUser] = useState('');

@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import Button from './ui/Button';
-import Form from './form/Form';
-import Input from './form/Input';
-import Label from './form/Label';
+import Form from './ui/Form';
+import Input from './ui/Input';
+import Label from './ui/Label';
 
-export default function TransferOperation({ loggedUser, data, setData }) {
+export default function TransferOperation({ loggedUser, data, setData, onResetTimer }) {
   const [transferTo, setTransferTo] = useState('');
   const [transferAmount, setTransferAmount] = useState('');
   const nowDate = new Date().toISOString();
@@ -55,6 +55,7 @@ export default function TransferOperation({ loggedUser, data, setData }) {
     }
     setTransferTo('');
     setTransferAmount('');
+    onResetTimer();
   }
 
   return (
