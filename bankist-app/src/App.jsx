@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { initialData } from './data/data';
 import Balance from './components/Balance';
-import Container from './components/Container';
+import Container from './components/ui/Container';
 import CloseOperation from './components/CloseOperation';
-import Input from './components/form/Input';
+import Input from './components/ui/Input';
 import LoanOperation from './components/LoanOperation';
 import LogoutTimer from './components/LogoutTimer';
 import Movements from './components/Movements';
@@ -14,17 +14,13 @@ import './assets/index.css';
 
 /* Original Bankist App by Jonas Schmedtmann. */
 
-/* TODO:
-- prevent logout timer from re-rendering every second
-*/
-
 export default function App() {
   const [data, setData] = useState(initialData);
   const [user, setUser] = useState('');
   const [password, setPassword] = useState('');
   const [loggedUser, setLoggedUser] = useState(''); // to display UI only
   const [isSorted, setIsSorted] = useState(false);
-  const [logoutTimer, setLogoutTimer] = useState(5); // change to 5 * 60
+  const [logoutTimer, setLogoutTimer] = useState(5 * 60);
 
   // Derived states (Helps update "real-time" but must all map data)
   let currUser = data.find((d) => user === d.username);
@@ -54,6 +50,7 @@ export default function App() {
     setUser('');
     setPassword('');
     setLoggedUser('');
+    handleResetTimer();
   }
 
   function handleLoginSubmit(e) {
@@ -107,21 +104,27 @@ export default function App() {
     }
   }
 
-  // 1. restart timer when user makes a transfer / takes out a loan
+  function handleResetTimer() {
+    setLogoutTimer(5 * 60);
+  }
 
   // Effects
   // Logout Timer (setInterval)
-  // useEffect(() => {
-  //   const timer = setInterval(() => {
-  //     if (loggedUser && logoutTimer > 0) {
-  //       setLogoutTimer((l) => l - 1);
-  //     }
-  //   }, 1000);
+  useEffect(() => {
+    const timer = setInterval(() => {
+      if (loggedUser && logoutTimer > 0) {
+        setLogoutTimer((l) => l - 1);
+      }
+    }, 1000);
 
-  //   return () => {
-  //     clearInterval(timer);
-  //   };
-  // }, [loggedUser, logoutTimer]);
+    if (logoutTimer === 0) {
+      handleLogout();
+    }
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, [loggedUser, logoutTimer]);
 
   return (
     <>
@@ -171,12 +174,14 @@ export default function App() {
             loggedUser={loggedUser}
             data={data}
             setData={setData}
+            onResetTimer={handleResetTimer}
           />
           <LoanOperation
             currMovs={currMovs}
             currBalance={currBalance}
             setData={setData}
             user={user}
+            onResetTimer={handleResetTimer}
           />
           <CloseOperation
             loggedUser={loggedUser}
