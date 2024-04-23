@@ -1,6 +1,8 @@
 import SectionDescription from '../SectionDescription';
 import Feature from './Feature';
 
+// TODO: animation effect(?)
+
 export default function FeaturesSection() {
   return (
     <section

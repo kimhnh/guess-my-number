@@ -15,12 +15,12 @@ export default function Sections() {
   );
 }
 
-// Section: Features
+// Section: Features (Barebones done)
 //    - Description
 //          - Feature 1
 //          - Feature 2
 //          - Feature 3
-// Section: Operations
+// Section: Operations (TODO)
 //    - Description
 //      - Tab Container
 //          - Operation 1
