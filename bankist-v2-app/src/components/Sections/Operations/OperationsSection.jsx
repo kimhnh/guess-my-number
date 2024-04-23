@@ -2,7 +2,6 @@ import { useState } from 'react';
 import SectionDescription from '../SectionDescription';
 import { tabsData } from './TabsData';
 import './Operations.css';
-import Operation from './Operation';
 
 export default function OperationsSection() {
   const [activeTab, setActiveTab] = useState(1);
@@ -33,8 +32,17 @@ export default function OperationsSection() {
             </button>
           ))}
         </div>
+
         {/* Active Operation */}
-        <Operation tab={currTab} />
+        <div className='operations__content operations__content--active'>
+          <div className={`operations__icon operations__icon--${currTab.num}`}>
+            <svg>
+              <use xlinkHref={currTab.svg}></use>
+            </svg>
+          </div>
+          <h5 className='operations__header'>{currTab.header}</h5>
+          <p>{currTab.description}</p>
+        </div>
       </div>
     </section>
   );

@@ -1,7 +1,7 @@
 import SectionDescription from '../SectionDescription';
 import Feature from './Feature';
 
-// TODO: animation effect(?)
+// TODO: implement animation/transform for scrolling
 
 export default function FeaturesSection() {
   return (
