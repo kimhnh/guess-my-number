@@ -1,11 +1,42 @@
+import { useEffect, useState, useRef } from 'react';
 import NavListItem from '../ui/NavListItem';
 import './Header.css';
 
+// TODO: animation on mouseover/out on links
+// https://dev.to/producthackers/intersection-observer-using-react-49ko
+
 export default function Header() {
+  const [sticky, setSticky] = useState(false);
+  const headerEl = useRef(null);
+
+  function callback(entries) {
+    const [entry] = entries; // destructure
+    setSticky(!entry.isIntersecting); // boolean value
+  }
+
+  const options = {
+    root: null, //entire viewport
+    rootMargin: `-90px`, // hard-coded for now
+    threshold: 0,
+  };
+  // useEffect
+  useEffect(() => {
+    const headerObserver = new IntersectionObserver(callback, options);
+    if (headerEl.current) headerObserver.observe(headerEl.current);
+
+    // clean-up function
+    return () => {
+      if (headerEl.current) headerObserver.unobserve(headerEl.current);
+    };
+  }, []);
+
   return (
-    <header className='header'>
+    <header
+      className='header'
+      ref={headerEl}
+    >
       {/* Navbar */}
-      <nav className='nav'>
+      <nav className={`nav ${sticky ? 'sticky' : ''}`}>
         <img
           src='/logo.png'
           alt='bankist logo'
