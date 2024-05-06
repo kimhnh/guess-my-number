@@ -35,6 +35,15 @@
   list-style: none;
 }
 
+/* hover */
+.nav__links--full {
+  opacity: 1;
+}
+
+.nav__links--half {
+  opacity: 0.5;
+}
+
 .nav__item {
   margin-left: 4rem;
 }

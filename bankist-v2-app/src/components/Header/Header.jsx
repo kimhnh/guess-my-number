@@ -2,25 +2,26 @@ import { useEffect, useState, useRef } from 'react';
 import NavListItem from '../ui/NavListItem';
 import './Header.css';
 
-// TODO: animation on mouseover/out on links
+// TODO: 1. extract hook into custom hook. 2. animation on mouseover/out on links
 // https://dev.to/producthackers/intersection-observer-using-react-49ko
 
 export default function Header() {
   const [sticky, setSticky] = useState(false);
   const headerEl = useRef(null);
 
-  function callback(entries) {
-    const [entry] = entries; // destructure
-    setSticky(!entry.isIntersecting); // boolean value
-  }
-
-  const options = {
-    root: null, //entire viewport
-    rootMargin: `-90px`, // hard-coded for now
-    threshold: 0,
-  };
-  // useEffect
+  // Sticky navigation
   useEffect(() => {
+    function callback(entries) {
+      const [entry] = entries; // destructure
+      setSticky(!entry.isIntersecting); // boolean value
+    }
+
+    const options = {
+      root: null, //entire viewport
+      rootMargin: `-90px`, // hard-coded
+      threshold: 0,
+    };
+
     const headerObserver = new IntersectionObserver(callback, options);
     if (headerEl.current) headerObserver.observe(headerEl.current);
 
@@ -43,13 +44,13 @@ export default function Header() {
           className='nav__logo'
           id='logo'
         />
-        <ul className='nav__links'>
+        <ul className={`nav__links`}>
           <NavListItem href={'#section--1'}>Features</NavListItem>
           <NavListItem href={'#section--2'}>Operations</NavListItem>
           <NavListItem href={'#section--3'}>Testimonials</NavListItem>
           <NavListItem
-            className={'nav__link nav__link--btn btn--show-modal'}
             href={'#'}
+            className='nav__link nav__link--btn btn--show-modal'
           >
             Open Account
           </NavListItem>
