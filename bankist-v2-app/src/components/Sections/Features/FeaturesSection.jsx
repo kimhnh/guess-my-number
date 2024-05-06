@@ -1,9 +1,43 @@
+import { useEffect, useRef, useState } from 'react';
 import SectionDescription from '../SectionDescription';
-import Feature from './Feature';
+import { FeaturesData } from './FeaturesData';
 
-// TODO: implement animation/transform for scrolling
+// UPDATE: ref on all image elements
+// https://stackoverflow.com/questions/54633690/how-can-i-use-multiple-refs-for-an-array-of-elements-with-hooks
+// 3. do this for all images but with IntersectionObserver
 
 export default function FeaturesSection() {
+  const [data, setData] = useState(FeaturesData);
+  const featuresEl = useRef(null);
+
+  useEffect(() => {
+    function callback(entries) {
+      const [entry] = entries;
+
+      if (entry.isIntersecting) {
+        setData((d) =>
+          d.map((el) =>
+            el.type === 'image' ? { ...el, visible: entry.isIntersecting } : { ...el }
+          )
+        );
+      }
+    }
+
+    const options = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0,
+    };
+
+    const divObserver = new IntersectionObserver(callback, options);
+    if (featuresEl.current) divObserver.observe(featuresEl.current);
+
+    // clean-up function
+    return () => {
+      if (featuresEl.current) divObserver.unobserve(featuresEl.current);
+    };
+  }, []);
+
   return (
     <section
       className='section'
@@ -17,51 +51,33 @@ export default function FeaturesSection() {
         </h3>
       </SectionDescription>
 
-      <div className='features'>
-        {/* Feature 1 */}
-        <img
-          src='./src/assets/images/digital-lazy.jpg'
-          data-src='./src/assets/images/digital.jpg'
-          alt='computer'
-          className='features__img lazy-img'
-        />
-        <Feature xlinkHref='/icons.svg#icon-monitor'>
-          <h5 className='features__header'>100% digital bank</h5>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Unde alias sint quos?
-            Accusantium a fugiat porro reiciendis saepe quibusdam debitis ducimus.
-          </p>
-        </Feature>
-
-        {/* Feature 2 */}
-        <Feature xlinkHref='/icons.svg#icon-trending-up'>
-          <h5 className='features__header'>Watch your money grow</h5>
-          <p>
-            Nesciunt quos autem dolorum voluptates cum dolores dicta fuga inventore ab? Nulla
-            incidunt eius numquam sequi iste pariatur quibusdam!
-          </p>
-        </Feature>
-        <img
-          src='./src/assets/images/grow-lazy.jpg'
-          data-src='./src/assets/images/grow.jpg'
-          alt='plant'
-          className='features__img lazy-img'
-        />
-
-        {/* Feature 3 */}
-        <img
-          src='./src/assets/images/card-lazy.jpg'
-          data-src='./src/assets/images/card.jpg'
-          alt='credit card'
-          className='features__img lazy-img'
-        />
-        <Feature xlinkHref='/icons.svg#icon-credit-card'>
-          <h5 className='features__header'>Free debit card included</h5>
-          <p>
-            Quasi, fugit in cumque cupiditate reprehenderit debitis animi enim eveniet consequatur
-            odit quam quos possimus assumenda dicta fuga inventore ab.
-          </p>
-        </Feature>
+      <div
+        className='features'
+        ref={featuresEl}
+      >
+        {data.map((el) =>
+          el.type === 'image' ? (
+            <img
+              className={`features__img ${el.visible ? '' : 'lazy-img'}`}
+              src={el.visible ? el.dataSrc : el.src}
+              alt={el.alt}
+              key={el.num}
+            />
+          ) : (
+            <div
+              className='features__feature'
+              key={el.num}
+            >
+              <div className='features__icon'>
+                <svg>
+                  <use xlinkHref={el.xlinkHref}></use>
+                </svg>
+              </div>
+              <h5 className='features__header'>{el.header}</h5>
+              <p>{el.description}</p>
+            </div>
+          )
+        )}
       </div>
     </section>
   );
